@@ -32,9 +32,6 @@ public class MainActivity extends AppCompatActivity{
          * Here , we are inflating the TabFragment as the first Fragment
          */
 
-        mFragmentManager = getSupportFragmentManager();
-        mFragmentTransaction = mFragmentManager.beginTransaction();
-        mFragmentTransaction.replace(R.id.containerView,new TabFragment()).commit();
         /**
          * Setup click events on the Navigation View Items.
          */

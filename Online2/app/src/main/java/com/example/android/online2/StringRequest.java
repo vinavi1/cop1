@@ -35,7 +35,7 @@ public class StringRequest extends com.android.volley.toolbox.StringRequest  {
             Activity activity) {
         super(method, url, listener, errorListener);
         this.activity = activity;
-        preferences=activity.getSharedPreferences(MainActivity.MyPREFERENCES, 0);
+        preferences=activity.getSharedPreferences(Login.MyPREFERENCES, 0);
     }
 
     @Override
