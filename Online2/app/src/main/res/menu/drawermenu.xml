@@ -11,30 +11,4 @@
         android:id="@+id/nav_item_sent"
         android:icon="@drawable/car"/>
 
-    <item android:title="Drafts"
-        android:id="@+id/nav_item_draft"
-        android:icon="@drawable/car"/>
-
-
-
-    <item android:title="Others">
-        <menu>
-            <item
-                android:title="Spam"
-                android:icon="@drawable/car"/>
-            <item
-                android:title="Bin"
-                android:icon="@drawable/car"/>
-        </menu>
-    </item>
-
-    <group android:id="@+id/group_settings_id">
-
-        <item android:title="Settings"
-            android:icon="@drawable/car"/>
-        <item android:title="Help"
-            android:icon="@drawable/car"/>
-    </group>
-
-
 </menu>
