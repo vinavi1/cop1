@@ -3,6 +3,7 @@ package com.example.android.online2;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -134,15 +135,17 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
     }
 
+    @Override
+    public void onBackPressed() {
 
-
+    }
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.login:
 
                 final SharedPreferences.Editor editor=sharedPreferences.edit();
-                url="http://192.168.23.1:8000/default/login.json?userid="+u_entered+"&password="+p_entered;
+                url="http://10.192.40.165:8000/default/login.json?userid="+u_entered+"&password="+p_entered;
                 StringRequest stringRequest=new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String s) {

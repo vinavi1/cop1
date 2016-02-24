@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -24,6 +25,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -56,20 +58,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         sharedPreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+        mNavigationView = (NavigationView) findViewById(R.id.shitstuff) ;
 
-        url="http://192.168.23.1:8000/courses/list.json";
+
+
+        url="http://10.192.40.165:8000/courses/list.json";
         StringRequest stringRequest=new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 try {
                     JSONObject jsonObject= new JSONObject(s);
-
-
-                    if(jsonObject.getBoolean("success")){
-
+                    JSONArray jsonArray=jsonObject.getJSONArray("courses");
+                    for (int i=0 ; i<jsonArray.length();i++) {
+                        JSONObject j = jsonArray.getJSONObject(i);
+                        String codename = j.getString("code");
+                        m.add(1,i,0,codename);
 
                     }
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -80,22 +86,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         }, this);
+
+
         rq.add(stringRequest);
 
+        m = mNavigationView.getMenu();
+        m.add(2,10,0,"Log_out");
 
-
+        Intent intent = getIntent();
+        String name = intent.getStringExtra("first")+" "+intent.getStringExtra("last");
+        String entry_no = intent.getStringExtra("entry_no");
+        String email = intent.getStringExtra("email");
         /**
          *Setup the DrawerLayout and NavigationView
          */
 
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
-        mNavigationView = (NavigationView) findViewById(R.id.shitstuff) ;
 
-        m = mNavigationView.getMenu();
-        m.add(1,5,0,"Foo5");
-        m.add(1,6,0,"Foo6");
-        m.add(1,7,0,"Foo7");
 
+
+        Bundle bundle = new Bundle();
+        bundle.putString("name", name);
+        bundle.putString("entry_no",entry_no);
+        bundle.putString("email",email);
+        // set Fragmentclass Arguments
+        Overview overobj = new Overview();
+        overobj.setArguments(bundle);
 
         /**
          * Lets inflate the very first fragment
@@ -103,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
          */
         mFragmentManager = getSupportFragmentManager();
         mFragmentTransaction = mFragmentManager.beginTransaction();
-        //mFragmentTransaction.replace(R.id.containerView,new TabFragment()).commit();
+        mFragmentTransaction.replace(R.id.containerView,overobj).commit();
         /**
          * Setup click events on the Navigation View Items.
          */
@@ -115,19 +130,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-                if (menuItem.getItemId() == 5) {
-                    FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.containerView,new PrimaryFragment()).commit();
+                if (menuItem.getItemId() == 5 ) {
+                    final int y = menuItem.getTitle().length();
+                    url = "http://10.192.40.165:8000/default/logout.json";
+                    StringRequest jlogout = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String s) {
+                            try {
+                                JSONObject noticount= new JSONObject(s);
+                                if (noticount.getInt("noti_count")==4){
+                                    SharedPreferences.Editor editor= sharedPreferences.edit();
+                                    editor.clear();
+                                    editor.commit();
+                                    Intent intent= new Intent(instance1,Login.class);
+                                    startActivity(intent);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    },new Response.ErrorListener(){
+                        @Override
+                        public void onErrorResponse(VolleyError volleyError) {
+                            Log.e("Volley","hello");
+                        }
+                    },instance1);
+                    rq.add(jlogout);
                 }
                 if (menuItem.getItemId() == 6) {
                     FragmentTransaction yfragmentTransaction = mFragmentManager.beginTransaction();
-                    yfragmentTransaction.replace(R.id.containerView,new SocialFragment()).commit();
+                    yfragmentTransaction.replace(R.id.containerView,new TabFragment()).commit();
 
                 }
 
-                if (menuItem.getItemId() == R.id.nav_item_inbox) {
+                if (menuItem.getItemId() == R.id.nav_item_grades) {
                     FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
-                    xfragmentTransaction.replace(R.id.containerView,new PrimaryFragment()).commit();
+                    xfragmentTransaction.replace(R.id.containerView,new GradeActivity()).commit();
 
                 }
 
@@ -155,4 +193,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
         xfragmentTransaction.replace(R.id.containerView,new SocialFragment()).commit();
     }
+
+    boolean doubleBackToExitPressedOnce = false;
+
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            SharedPreferences.Editor editor= sharedPreferences.edit();
+            editor.clear();
+            editor.commit();
+            Intent intent= new Intent(instance1,Login.class);
+            startActivity(intent);
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "click BACK again to log_out", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce=false;
+            }
+        }, 2000);
+    }
+
+
 }

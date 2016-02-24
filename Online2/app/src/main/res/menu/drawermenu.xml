@@ -3,12 +3,12 @@
 
 
 
-    <item android:title="Inbox"
-        android:id="@+id/nav_item_inbox"
+    <item android:title="GRADES"
+        android:id="@+id/nav_item_grades"
         android:icon="@drawable/car"/>
 
-    <item android:title="Sent"
-        android:id="@+id/nav_item_sent"
+    <item android:title="NOTIFICATIONS"
+        android:id="@+id/nav_item_notifications"
         android:icon="@drawable/car"/>
 
 </menu>
